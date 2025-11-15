@@ -1,0 +1,56 @@
+package com.loCxCore.ui;
+
+import com.loCxCore.core.enums.*;
+import com.loCxCore.menu.drink.Drink;
+import com.loCxCore.menu.drink.DrinkMenu;
+import com.loCxCore.orders.Order;
+import com.loCxCore.services.InputHandler;
+
+import java.util.List;
+
+public class AddDrinkScreen {
+
+    private final Order order;
+    //declare outside to use on methods so i can display price of topping based on size
+    DrinkSize size;
+    // Prompts user to select drink size and type, then adds to order
+    public void start() {
+        System.out.println("Choose your Drink Size");
+        size = chooseSize();
+        String drinkName = chooseDrink();
+        Drink drink = new Drink(drinkName,size);
+        order.addItem(drink);
+        System.out.println("✅ Your Drink is Added");
+
+    }
+    public AddDrinkScreen(Order order) {
+
+        this.order = order;
+    }
+
+    // Displays available drinks and returns user selection
+    private String chooseDrink() {
+        List<String> drinks = DrinkMenu.DRINKS;
+        System.out.println("Pick a drink");
+        for (int i =0; i<drinks.size(); i++) {
+            System.out.printf("%d) %s%n", i + 1, drinks.get(i));
+        }
+        int choice = InputHandler.getIntInput("Your choice: ", 1,drinks.size());
+        return drinks.get(choice -1);
+    }
+    // Returns selected drink size based on user input
+    private DrinkSize chooseSize() {
+        String prompt = """
+                select size:
+                1: Small
+                2: Medium
+                3: Large
+                """;
+        int choice = InputHandler.getIntInput(prompt, 1, 3);
+        return switch (choice) {
+            case 1 -> DrinkSize.SMALL;
+            case 2 -> DrinkSize.MEDIUM;
+            default -> DrinkSize.LARGE;
+        };
+    }
+}

@@ -9,20 +9,47 @@ import com.loCxCore.core.interfaces.Customizable;
 import com.loCxCore.menu.MenuItem;
 import com.loCxCore.menu.pizza.side.Side;
 import com.loCxCore.menu.pizza.topping.ToppingOption;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Entity
+@DiscriminatorValue("PIZZA")
 public class Pizza extends MenuItem implements Customizable<ToppingOption> {
 
+    @Transient
+    @JsonIgnore
     private final Customization<ToppingOption> toppings = new Customization<>();
-    //single choice is true one choice is allowed so it replaces the choice instead
-    private  final Customization<PizzaSize> size = new Customization<>(true);
+    
+    @Transient
+    @JsonIgnore
+    private final Customization<PizzaSize> size = new Customization<>(true);
+    
+    @Transient
+    @JsonIgnore
     private final Customization<CrustType> crust = new Customization<>(true);
+    
+    @Transient
+    @JsonIgnore
     private final Customization<CheeseType> cheese = new Customization<>(true);
+    
+    @Transient
+    @JsonIgnore
     private final Customization<SauceType> sauce = new Customization<>(true);
+    
+    @Transient
+    @JsonIgnore
     private final List<Side> sides = new ArrayList<>();
+
+    // Default constructor for JPA
+    public Pizza() {
+        super();
+    }
 
     //all pizza should start with name price and inttialsize and crust
     public Pizza(double price, PizzaSize initialSize, CrustType initialCrust, SauceType initialSauce, CheeseType initialCheese ) {

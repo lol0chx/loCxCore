@@ -52,7 +52,7 @@ public class Receipt {
         }
 
         // Iterate through all items and format each type
-        List<Orderable> items = order.getItems();
+        List<Orderable> items = new ArrayList<>(order.getItems());
         for (Orderable item : items) {
             // Format pizza with size, crust, toppings, and sides
             if (item instanceof Pizza pizza) {
@@ -163,7 +163,7 @@ public class Receipt {
         LocalDateTime now = LocalDateTime.now();
         String date = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         String time = now.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        double total = PriceCalculator.calculateTotal(order.getItems());
+        double total = PriceCalculator.calculateTotal(new ArrayList<>(order.getItems()));
         
         String transactionLine = String.format("%s|%s|%s|%s|%.2f%n", 
             receiptId, date, time, customerName, total);

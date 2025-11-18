@@ -1,0 +1,136 @@
+.order-container {
+  padding: 40px 20px;
+  min-height: calc(100vh - 70px);
+}
+
+.page-title {
+  color: white;
+  text-align: center;
+  font-size: 36px;
+  margin-bottom: 32px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.message {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 24px;
+  font-weight: 600;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.order-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 968px) {
+  .order-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.order-section, .cart-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.customer-input {
+  margin-top: 12px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.toppings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.topping-btn {
+  padding: 10px;
+  background: #f0f0f0;
+  color: #333;
+  border: 2px solid transparent;
+  font-size: 14px;
+}
+
+.topping-btn.active {
+  background: #667eea;
+  color: white;
+  border-color: #5568d3;
+}
+
+.full-width {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.empty-cart {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+.cart-items {
+  max-height: 500px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.cart-item {
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.item-details h3 {
+  margin-bottom: 8px;
+  color: #667eea;
+}
+
+.item-details p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.item-details .toppings {
+  color: #48bb78;
+  font-weight: 500;
+}
+
+.cart-total {
+  background: #667eea;
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.cart-total h3 {
+  font-size: 24px;
+  margin: 0;
+}

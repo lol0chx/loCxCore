@@ -10,6 +10,7 @@ import com.loCxCore.menu.MenuItem;
 import com.loCxCore.menu.pizza.side.Side;
 import com.loCxCore.menu.pizza.topping.ToppingOption;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.DiscriminatorValue;
@@ -69,6 +70,8 @@ public class Pizza extends MenuItem implements Customizable<ToppingOption> {
         this.sauce.clear();
         this.sauce.add(sauce);
     }
+    
+    @JsonProperty("sauce")
     public SauceType getSauce() {
         return this.sauce.getAll().keySet().stream().findFirst().orElse(null);
     }
@@ -78,6 +81,8 @@ public class Pizza extends MenuItem implements Customizable<ToppingOption> {
         this.cheese.clear();
         this.cheese.add(cheese);
     }
+    
+    @JsonProperty("cheese")
     public CheeseType getCheese() {
         return this.cheese.getAll().keySet().stream().findFirst().orElse(null);
     }
@@ -87,22 +92,30 @@ public class Pizza extends MenuItem implements Customizable<ToppingOption> {
         size.clear();
         size.add(newSize);
     }
+    
     public void setCrust(CrustType newCrust) {
         crust.clear();
         crust.add(newCrust);
     }
+    
+    @JsonProperty("crust")
     public CrustType getCrust() {
         return crust.getAll().keySet().stream().findFirst().orElse(null);
     }
+    
+    @JsonProperty("size")
     public PizzaSize getSize() {
         return size.getAll().keySet().stream().findFirst().orElse(null);
     }
 
     // Returns unmodifiable topping map for receipt display
+    @JsonProperty("toppingsMap")
     public Map<ToppingOption, Integer> getToppingsMap() {
         return toppings.getAll();
     }
+    
     // Returns mutable customization object for price calculation
+    @JsonIgnore
     public Customization<ToppingOption> getToppings() {
         return toppings;
     }
@@ -142,7 +155,9 @@ public class Pizza extends MenuItem implements Customizable<ToppingOption> {
             price += currentSize.getBasePrice();
         }
         if (currentCrust != null) {
-            price += currentCrust.getExtraCost();
+            // Apply size multiplier to crust extra cost (stuffed crust scales with size)
+            double multiplier = getToppingMultiplier(currentSize);
+            price += currentCrust.getExtraCost() * multiplier;
         }
         for (Map.Entry<ToppingOption, Integer> entry : getToppingsMap().entrySet()) {
             double toppingBase = entry.getKey().getPrice();

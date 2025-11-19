@@ -9,8 +9,12 @@ import com.loCxCore.menu.pizza.topping.ToppingOption;
 import com.loCxCore.ui.CheckOutScreen;
 import com.loCxCore.services.PriceCalculator;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,9 +24,18 @@ import java.util.Map;
 public class Receipt {
     private final Order order;
     private final List<String> notes = new ArrayList<>();
+    private Double cashTendered;
+    private Double cashChange;
 
     public Receipt (Order order) {
         this.order = order;
+    }
+    
+    // Constructor for web-based orders with payment details
+    public Receipt(Order order, double cashTendered, double cashChange) {
+        this.order = order;
+        this.cashTendered = cashTendered;
+        this.cashChange = cashChange;
     }
 
     // Generates formatted receipt text with header, items, and footer
@@ -114,7 +127,13 @@ public class Receipt {
         receipt.append("  SUBTOTAL: $").append(String.format("%.2f", total)).append("\n");
 
         // Add cash payment details only when finalizing (includeThanks means it's checkout)
-        if(includeThanks && CheckOutScreen.getTendered() > 0) {
+        // First check if web-based payment details are available
+        if(includeThanks && cashTendered != null && cashTendered > 0) {
+            receipt.append("  Cash Tendered: $").append(String.format("%.2f", cashTendered)).append("\n");
+            receipt.append("  Change: $").append(String.format("%.2f", cashChange)).append("\n");
+        } 
+        // Fallback to CLI-based static payment details
+        else if(includeThanks && CheckOutScreen.getTendered() > 0) {
             receipt.append("  Cash Tendered: $").append(String.format("%.2f", CheckOutScreen.getTendered())).append("\n");
             receipt.append("  Change: $").append(String.format("%.2f", CheckOutScreen.getChange())).append("\n");
         }
@@ -146,14 +165,29 @@ public class Receipt {
     // Saves receipt to file in receipts directory
     public void saveToFile(String filename) {
         String content = generate(true); // Include thank you message when saving
-        try (FileWriter writer = new FileWriter("receipts/" + filename)) {
-            writer.write(content);
-            System.out.println("Receipt saved\n\n\n\n\n\n\n\n\n\n\n");
+        
+        // Ensure receipts directory exists
+        Path receiptsDir = Paths.get("receipts");
+        try {
+            if (!Files.exists(receiptsDir)) {
+                Files.createDirectories(receiptsDir);
+                System.out.println("Created receipts directory: " + receiptsDir.toAbsolutePath());
+            }
         } catch (IOException e) {
-            System.err.println("Failed to save receipt: " + e.getMessage());
+            System.err.println("Failed to create receipts directory: " + e.getMessage());
         }
         
-        // Save transaction summary to transactions.txt
+        // Save receipt file
+        Path receiptPath = receiptsDir.resolve(filename);
+        try (FileWriter writer = new FileWriter(receiptPath.toFile())) {
+            writer.write(content);
+            System.out.println("Receipt saved to: " + receiptPath.toAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("Failed to save receipt to " + receiptPath.toAbsolutePath() + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        // Save transaction summary to transactions.csv
         saveTransactionSummary(filename);
     }
     
@@ -168,10 +202,13 @@ public class Receipt {
         String transactionLine = String.format("%s|%s|%s|%s|%.2f%n", 
             receiptId, date, time, customerName, total);
         
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true))) {
+        Path transactionsPath = Paths.get("transactions.csv");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(transactionsPath.toFile(), true))) {
             writer.write(transactionLine);
+            System.out.println("Transaction saved to: " + transactionsPath.toAbsolutePath());
         } catch (IOException e) {
-            System.err.println("Failed to save transaction: " + e.getMessage());
+            System.err.println("Failed to save transaction to " + transactionsPath.toAbsolutePath() + ": " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

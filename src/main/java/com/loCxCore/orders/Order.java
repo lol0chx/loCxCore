@@ -29,6 +29,9 @@ public class Order {
     @Column(name = "status")
     private String status = "PENDING";
 
+    @Column(name = "daily_order_number")
+    private Integer dailyOrderNumber;
+
     public Order() {
         this.orderDate = LocalDateTime.now();
     }
@@ -71,6 +74,14 @@ public class Order {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Integer getDailyOrderNumber() {
+        return dailyOrderNumber;
+    }
+
+    public void setDailyOrderNumber(Integer dailyOrderNumber) {
+        this.dailyOrderNumber = dailyOrderNumber;
     }
 
     // Adds a new item to the order

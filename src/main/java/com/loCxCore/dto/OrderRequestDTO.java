@@ -7,6 +7,8 @@ public class OrderRequestDTO {
     private List<OrderItemDTO> items;
     private String totalPrice;
     private String orderDate;
+    private Double cashTendered;
+    private Double cashChange;
 
     public OrderRequestDTO() {
     }
@@ -42,4 +44,21 @@ public class OrderRequestDTO {
     public void setOrderDate(String orderDate) {
         this.orderDate = orderDate;
     }
+
+    public Double getCashTendered() {
+        return cashTendered;
+    }
+
+    public void setCashTendered(Double cashTendered) {
+        this.cashTendered = cashTendered;
+    }
+
+    public Double getCashChange() {
+        return cashChange;
+    }
+
+    public void setCashChange(Double cashChange) {
+        this.cashChange = cashChange;
+    }
 }
+

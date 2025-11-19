@@ -1,6 +1,7 @@
 package com.loCxCore.controller;
 
 import com.loCxCore.orders.Order;
+import com.loCxCore.orders.Receipt;
 import com.loCxCore.service.OrderService;
 import com.loCxCore.dto.OrderRequestDTO;
 import com.loCxCore.dto.OrderItemDTO;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,8 +34,9 @@ public class OrderController {
             Order order = new Order();
             order.setCustomerName(orderRequest.getCustomerName());
             order.setOrderDate(LocalDateTime.now());
-            order.setTotalPrice(Double.parseDouble(orderRequest.getTotalPrice()));
-            order.setStatus("PENDING");
+            order.setStatus("PAID");
+
+            double totalPrice = 0.0;
 
             // Convert DTOs to Pizza entities
             for (OrderItemDTO itemDTO : orderRequest.getItems()) {
@@ -60,12 +63,37 @@ public class OrderController {
                     }
                     
                     // Calculate and set the price
-                    pizza.setBasePrice(pizza.calculatePrice());
+                    double pizzaPrice = pizza.calculatePrice();
+                    pizza.setBasePrice(pizzaPrice);
+                    totalPrice += pizzaPrice;
                     order.addItem(pizza);
                 }
             }
 
+            // Set the calculated total price
+            order.setTotalPrice(totalPrice);
+
             Order createdOrder = orderService.createOrder(order);
+            
+            // Generate and save receipt with payment details
+            try {
+                Receipt receipt;
+                if (orderRequest.getCashTendered() != null && orderRequest.getCashChange() != null) {
+                    receipt = new Receipt(createdOrder, orderRequest.getCashTendered(), orderRequest.getCashChange());
+                } else {
+                    receipt = new Receipt(createdOrder);
+                }
+                // Receipt ID format: {orderId}-yyyyMMdd-HHmmss (e.g., 123-20251119-143025)
+                String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+                String receiptId = createdOrder.getId() + "-" + timestamp;
+                receipt.saveToFile(receiptId);
+                System.out.println("Receipt saved: " + receiptId);
+            } catch (Exception receiptError) {
+                System.err.println("Failed to save receipt: " + receiptError.getMessage());
+                receiptError.printStackTrace();
+                // Continue even if receipt fails - order is already saved
+            }
+            
             return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();

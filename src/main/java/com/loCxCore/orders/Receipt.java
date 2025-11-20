@@ -69,7 +69,10 @@ public class Receipt {
         for (Orderable item : items) {
             // Format pizza with size, crust, toppings, and sides
             if (item instanceof Pizza pizza) {
-                receipt.append("\n  🍕 [").append(itemNumber++).append("] ").append(pizza.getName()).append("\n");
+                String pizzaName = pizza.getSignaturePizzaName() != null && !pizza.getSignaturePizzaName().isEmpty() 
+                    ? "⭐ " + pizza.getSignaturePizzaName() 
+                    : pizza.getName();
+                receipt.append("\n  🍕 [").append(itemNumber++).append("] ").append(pizzaName).append("\n");
                 receipt.append("     Size: ").append(pizza.getSize()).append(" - $").append(String.format("%.2f", pizza.getBasePrice())).append("\n");
                 receipt.append("     Crust: ").append(pizza.getCrust());
                 if (pizza.getCrust().getExtraCost() > 0) {
@@ -77,7 +80,7 @@ public class Receipt {
                 }
                 receipt.append("\n     Sauce: ").append(pizza.getSauce()).append("\n");
                 receipt.append("     Cheese: ").append(pizza.getCheese()).append("\n");
-                Map<ToppingOption, Integer> toppings = pizza.getToppingsMap();
+                Map<String, Integer> toppings = pizza.getToppingsMap();
                 if (toppings.isEmpty()) {
                     receipt.append("     Toppings: None\n");
                 } else {
@@ -85,14 +88,17 @@ public class Receipt {
                     // Apply size multiplier to topping prices
                     PizzaSize size = pizza.getSize();
                     double multiplier = size != null ? size.getToppingMultiplier() : 1.0;
-                    toppings.forEach((topping, count) -> {
-                        double adjustedPrice = topping.getPrice() * multiplier;
-                        receipt.append("       • ").append(topping.getName())
-                                .append(" ($").append(String.format("%.2f", adjustedPrice));
-                        if (count > 1) {
-                            receipt.append(" x").append(count);
+                    toppings.forEach((toppingName, count) -> {
+                        ToppingOption topping = com.loCxCore.menu.pizza.topping.ToppingMenu.getToppingByName(toppingName);
+                        if (topping != null) {
+                            double adjustedPrice = topping.getPrice() * multiplier;
+                            receipt.append("       • ").append(toppingName)
+                                    .append(" ($").append(String.format("%.2f", adjustedPrice));
+                            if (count > 1) {
+                                receipt.append(" x").append(count);
+                            }
+                            receipt.append(")\n");
                         }
-                        receipt.append(")\n");
                     });
                 }
                 // Display sides if any

@@ -4,6 +4,8 @@ import './NewOrder.css'
 
 function NewOrder() {
   const [customerName, setCustomerName] = useState('')
+  const [pizzaMode, setPizzaMode] = useState('custom') // 'custom' or 'signature'
+  const [selectedSignaturePizza, setSelectedSignaturePizza] = useState('')
   const [currentItem, setCurrentItem] = useState({
     type: 'pizza',
     size: '',
@@ -18,10 +20,49 @@ function NewOrder() {
   const [paymentMethod, setPaymentMethod] = useState('')
   const [cashAmount, setCashAmount] = useState('')
 
+  const signaturePizzas = {
+    'Meat Lovers': {
+      description: 'Loaded with pepperoni, beef, bacon, and sausage',
+      crust: 'REGULAR',
+      sauce: 'MARINARA',
+      cheese: 'MOZZARELLA',
+      toppings: { 'Pepperoni': 1, 'Beef': 1, 'Bacon': 1, 'Italian Sausage': 1 }
+    },
+    'Veggie Supreme': {
+      description: 'Fresh veggies: mushrooms, peppers, onions, and olives',
+      crust: 'REGULAR',
+      sauce: 'MARINARA',
+      cheese: 'MOZZARELLA',
+      toppings: { 'Mushrooms': 1, 'Bell Peppers': 1, 'Onions': 1, 'Olives': 1 }
+    },
+    'Hawaiian': {
+      description: 'Ham and pineapple on marinara',
+      crust: 'REGULAR',
+      sauce: 'MARINARA',
+      cheese: 'MOZZARELLA',
+      toppings: { 'Ham': 1, 'Pineapple': 1 }
+    },
+    'BBQ Chicken': {
+      description: 'Grilled chicken with BBQ sauce, onions, and bell peppers',
+      crust: 'REGULAR',
+      sauce: 'BBQ',
+      cheese: 'CHEDDAR',
+      toppings: { 'Chicken': 1, 'Onions': 1, 'Bell Peppers': 1 }
+    },
+    'Margherita': {
+      description: 'Classic: tomatoes, basil, and extra mozzarella',
+      crust: 'REGULAR',
+      sauce: 'MARINARA',
+      cheese: 'MOZZARELLA',
+      toppings: { 'Tomatoes': 1, 'Basil': 1, 'Extra Cheese': 1 }
+    }
+  }
+
   const toppingOptions = [
-    'Pepperoni', 'Mushrooms', 'Onions', 'Italian Sausage', 'Bacon',
-    'Olives', 'Bell Peppers', 'Pineapple', 'Spinach', 'Tomatoes',
-    'Ham', 'Chicken', 'Beef', 'Garlic', 'Basil', 'Jalapeños'
+    'Pepperoni', 'Beef', 'Italian Sausage', 'Ham', 'Bacon', 'Chicken',
+    'Salami', 'Anchovies', 'Extra Cheese', 'Extra Sauce', 'Mushrooms',
+    'Bell Peppers', 'Onions', 'Olives', 'Tomatoes', 'Spinach',
+    'Jalapeños', 'Pineapple', 'Basil', 'Garlic', 'Artichokes', 'Sun-dried Tomatoes'
   ]
 
   // Topping prices - matches backend ToppingMenu.java exactly
@@ -50,6 +91,20 @@ function NewOrder() {
     'Sun-dried Tomatoes': 1.25
   }
 
+  const selectSignaturePizza = (name) => {
+    const pizza = signaturePizzas[name]
+    setSelectedSignaturePizza(name)
+    setCurrentItem({
+      type: 'pizza',
+      size: currentItem.size || '', // Keep size if already selected
+      crust: pizza.crust,
+      sauce: pizza.sauce,
+      cheese: pizza.cheese,
+      toppings: { ...pizza.toppings },
+      signatureName: name
+    })
+  }
+
   const addToCart = () => {
     // Validate all required fields are selected
     if (!currentItem.size || !currentItem.crust || !currentItem.sauce || !currentItem.cheese) {
@@ -71,6 +126,7 @@ function NewOrder() {
       cheese: '',
       toppings: {}
     })
+    setSelectedSignaturePizza('')
   }
 
   const removeFromCart = (id) => {
@@ -201,6 +257,7 @@ function NewOrder() {
           crust: item.crust,
           sauce: item.sauce,
           cheese: item.cheese,
+          signatureName: item.signatureName || null,
           toppings: Object.entries(item.toppings)
             .flatMap(([topping, count]) => Array(count).fill(topping))
         })),
@@ -244,18 +301,69 @@ function NewOrder() {
         <div className="order-grid">
           <div className="order-section">
             <div className="card">
-              <h2>Customer Information</h2>
-              <input
-                type="text"
-                placeholder="Enter your name"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                className="customer-input"
-              />
-            </div>
-
-            <div className="card">
               <h2>Build Your Pizza</h2>
+              
+              {/* Pizza Mode Toggle */}
+              <div className="form-group">
+                <label>Pizza Type</label>
+                <div className="pizza-mode-toggle">
+                  <button 
+                    className={`toggle-btn ${pizzaMode === 'custom' ? 'active' : ''}`}
+                    onClick={() => {
+                      setPizzaMode('custom')
+                      setSelectedSignaturePizza('')
+                      setCurrentItem({
+                        type: 'pizza',
+                        size: currentItem.size,
+                        crust: '',
+                        sauce: '',
+                        cheese: '',
+                        toppings: {}
+                      })
+                    }}
+                  >
+                    🍕 Custom Pizza
+                  </button>
+                  <button 
+                    className={`toggle-btn ${pizzaMode === 'signature' ? 'active' : ''}`}
+                    onClick={() => {
+                      setPizzaMode('signature')
+                      setCurrentItem({
+                        type: 'pizza',
+                        size: currentItem.size,
+                        crust: '',
+                        sauce: '',
+                        cheese: '',
+                        toppings: {}
+                      })
+                    }}
+                  >
+                    ⭐ Signature Pizza
+                  </button>
+                </div>
+              </div>
+
+              {/* Signature Pizza Selection */}
+              {pizzaMode === 'signature' && (
+                <div className="form-group">
+                  <label>Choose Signature Pizza *</label>
+                  <div className="signature-pizza-grid">
+                    {Object.entries(signaturePizzas).map(([name, details]) => (
+                      <div 
+                        key={name}
+                        className={`signature-pizza-card ${selectedSignaturePizza === name ? 'selected' : ''}`}
+                        onClick={() => selectSignaturePizza(name)}
+                      >
+                        <h3>{name}</h3>
+                        <p className="signature-description">{details.description}</p>
+                        <div className="signature-toppings">
+                          {Object.keys(details.toppings).join(', ')}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               <div className="form-group">
                 <label>Size *</label>
@@ -271,58 +379,122 @@ function NewOrder() {
                 </select>
               </div>
 
-              <div className="form-group">
-                <label>Crust *</label>
-                <select
-                  value={currentItem.crust}
-                  onChange={(e) => setCurrentItem({ ...currentItem, crust: e.target.value })}
-                  required
-                >
-                  <option value="" disabled>-- Select Crust --</option>
-                  <option value="REGULAR">Regular</option>
-                  <option value="THIN">Thin Crust</option>
-                  <option value="THICK">Thick Crust</option>
-                  <option value="STUFFED">
-                    Stuffed Crust (+$
-                    {currentItem.size === 'SMALL' ? '2.00' : 
-                     currentItem.size === 'MEDIUM' ? '3.00' : 
-                     currentItem.size === 'LARGE' ? '4.00' : '2.00-4.00'})
-                  </option>
-                </select>
-              </div>
+              {/* Only show customization for custom pizzas */}
+              {pizzaMode === 'custom' && (
+                <>
+                  <div className="form-group">
+                    <label>Crust *</label>
+                    <select
+                      value={currentItem.crust}
+                      onChange={(e) => setCurrentItem({ ...currentItem, crust: e.target.value })}
+                      required
+                    >
+                      <option value="" disabled>-- Select Crust --</option>
+                      <option value="REGULAR">Regular</option>
+                      <option value="THIN">Thin Crust</option>
+                      <option value="THICK">Thick Crust</option>
+                      <option value="STUFFED">
+                        Stuffed Crust (+$
+                        {currentItem.size === 'SMALL' ? '2.00' : 
+                         currentItem.size === 'MEDIUM' ? '3.00' : 
+                         currentItem.size === 'LARGE' ? '4.00' : '2.00-4.00'})
+                      </option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Sauce *</label>
+                    <select
+                      value={currentItem.sauce}
+                      onChange={(e) => setCurrentItem({ ...currentItem, sauce: e.target.value })}
+                      required
+                    >
+                      <option value="" disabled>-- Select Sauce --</option>
+                      <option value="MARINARA">Marinara</option>
+                      <option value="BBQ">BBQ</option>
+                      <option value="WHITE_GARLIC">White Garlic</option>
+                      <option value="PESTO">Pesto</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Cheese *</label>
+                    <select
+                      value={currentItem.cheese}
+                      onChange={(e) => setCurrentItem({ ...currentItem, cheese: e.target.value })}
+                      required
+                    >
+                      <option value="" disabled>-- Select Cheese --</option>
+                      <option value="MOZZARELLA">Mozzarella</option>
+                      <option value="CHEDDAR">Cheddar</option>
+                      <option value="PARMESAN">Parmesan</option>
+                      <option value="VEGAN">Vegan</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* Show customization options for signature pizzas */}
+              {pizzaMode === 'signature' && selectedSignaturePizza && (
+                <>
+                  <div className="signature-customization">
+                    <h3>Customize Your {selectedSignaturePizza}</h3>
+                    
+                    <div className="form-group">
+                      <label>Crust</label>
+                      <select
+                        value={currentItem.crust}
+                        onChange={(e) => setCurrentItem({ ...currentItem, crust: e.target.value })}
+                      >
+                        <option value="REGULAR">Regular</option>
+                        <option value="THIN">Thin Crust</option>
+                        <option value="THICK">Thick Crust</option>
+                        <option value="STUFFED">
+                          Stuffed Crust (+$
+                          {currentItem.size === 'SMALL' ? '2.00' : 
+                           currentItem.size === 'MEDIUM' ? '3.00' : 
+                           currentItem.size === 'LARGE' ? '4.00' : '2.00-4.00'})
+                        </option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Sauce</label>
+                      <select
+                        value={currentItem.sauce}
+                        onChange={(e) => setCurrentItem({ ...currentItem, sauce: e.target.value })}
+                      >
+                        <option value="MARINARA">Marinara</option>
+                        <option value="BBQ">BBQ</option>
+                        <option value="WHITE_GARLIC">White Garlic</option>
+                        <option value="PESTO">Pesto</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Cheese</label>
+                      <select
+                        value={currentItem.cheese}
+                        onChange={(e) => setCurrentItem({ ...currentItem, cheese: e.target.value })}
+                      >
+                        <option value="MOZZARELLA">Mozzarella</option>
+                        <option value="CHEDDAR">Cheddar</option>
+                        <option value="PARMESAN">Parmesan</option>
+                        <option value="VEGAN">Vegan</option>
+                      </select>
+                    </div>
+
+                    <div className="config-item-box">
+                      <strong>Included Toppings:</strong> {Object.keys(currentItem.toppings).join(', ')}
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div className="form-group">
-                <label>Sauce *</label>
-                <select
-                  value={currentItem.sauce}
-                  onChange={(e) => setCurrentItem({ ...currentItem, sauce: e.target.value })}
-                  required
-                >
-                  <option value="" disabled>-- Select Sauce --</option>
-                  <option value="MARINARA">Marinara</option>
-                  <option value="BBQ">BBQ</option>
-                  <option value="WHITE_GARLIC">White Garlic</option>
-                  <option value="PESTO">Pesto</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Cheese *</label>
-                <select
-                  value={currentItem.cheese}
-                  onChange={(e) => setCurrentItem({ ...currentItem, cheese: e.target.value })}
-                  required
-                >
-                  <option value="" disabled>-- Select Cheese --</option>
-                  <option value="MOZZARELLA">Mozzarella</option>
-                  <option value="CHEDDAR">Cheddar</option>
-                  <option value="PARMESAN">Parmesan</option>
-                  <option value="VEGAN">Vegan</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Toppings (click + to add, - to remove)</label>
+                <label>
+                  {pizzaMode === 'signature' ? 'Additional Toppings (optional)' : 'Toppings (click + to add, - to remove)'}
+                </label>
                 <div className="toppings-grid">
                   {toppingOptions.map(topping => {
                     const price = getToppingPriceForSize(topping, currentItem.size)
@@ -357,6 +529,53 @@ function NewOrder() {
                 Add to Cart
               </button>
             </div>
+
+            {/* Pizza Preview */}
+            {currentItem.size && (
+              <div className="card pizza-preview-card">
+                <h2>Pizza Preview</h2>
+                <div className="pizza-preview">
+                  <div className={`pizza-visual pizza-size-${currentItem.size.toLowerCase()}`}>
+                    {/* Pizza base */}
+                    <div className="pizza-base">
+                      {/* Sauce layer */}
+                      <div className={`pizza-sauce sauce-${currentItem.sauce?.toLowerCase() || 'none'}`}></div>
+                      
+                      {/* Cheese layer */}
+                      <div className={`pizza-cheese cheese-${currentItem.cheese?.toLowerCase() || 'none'}`}></div>
+                      
+                      {/* Toppings */}
+                      <div className="pizza-toppings">
+                        {Object.entries(currentItem.toppings).map(([topping, count], idx) => {
+                          // Create visual representation for each topping instance
+                          return Array.from({ length: Math.min(count, 8) }).map((_, i) => (
+                            <div 
+                              key={`${topping}-${i}`}
+                              className={`topping topping-${topping.toLowerCase().replace(/\s+/g, '-')}`}
+                              style={{
+                                top: `${15 + (idx * 12 + i * 8) % 60}%`,
+                                left: `${15 + (idx * 15 + i * 11) % 60}%`,
+                                transform: `rotate(${idx * 30 + i * 45}deg)`
+                              }}
+                            ></div>
+                          ))
+                        })}
+                      </div>
+                      
+                      {/* Crust indicator */}
+                      <div className={`pizza-crust crust-${currentItem.crust?.toLowerCase() || 'regular'}`}></div>
+                    </div>
+                  </div>
+                  
+                  <div className="pizza-info">
+                    <p className="size-label">{currentItem.size} Pizza</p>
+                    {currentItem.signatureName && (
+                      <p className="signature-label">⭐ {currentItem.signatureName}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="cart-section">
@@ -375,7 +594,7 @@ function NewOrder() {
                       return (
                         <div key={item.id} className="cart-item">
                           <div className="item-details">
-                            <h3>Pizza #{index + 1}</h3>
+                            <h3>{item.signatureName ? `⭐ ${item.signatureName}` : `🍕 Pizza #${index + 1}`}</h3>
                             <p><strong>Size:</strong> {item.size}</p>
                             <p><strong>Crust:</strong> {item.crust} {stuffedCost && `(+$${stuffedCost})`}</p>
                             <p><strong>Sauce:</strong> {item.sauce}</p>
@@ -402,6 +621,18 @@ function NewOrder() {
 
                   <div className="cart-total">
                     <h3>Total: ${calculateTotal()}</h3>
+                  </div>
+
+                  <div className="customer-info-checkout">
+                    <h3>Your Name</h3>
+                    <input
+                      type="text"
+                      placeholder="Enter your name"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      className="customer-input"
+                      required
+                    />
                   </div>
 
                   <button onClick={handlePlaceOrder} className="btn-secondary full-width">

@@ -228,7 +228,7 @@ function Ledger() {
                   
                   return (
                     <div key={index} className="item-detail">
-                      <h4>🍕 Pizza #{index + 1}</h4>
+                      <h4>{item.signatureName ? `⭐ ${item.signatureName}` : `🍕 Pizza #${index + 1}`}</h4>
                       <p><strong>Size:</strong> {size} - ${sizePrice.toFixed(2)}</p>
                       <p><strong>Crust:</strong> {crust} {crustExtra > 0 && `(+$${crustExtra.toFixed(2)})`}</p>
                       <p><strong>Sauce:</strong> {sauce}</p>
@@ -348,7 +348,6 @@ function Ledger() {
               <thead>
                 <tr>
                   <th>Order #</th>
-                  <th>DB ID</th>
                   <th>Receipt ID</th>
                   <th>Date</th>
                   <th>Time</th>
@@ -361,7 +360,7 @@ function Ledger() {
               <tbody>
                 {filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan="9" className="no-results">
+                    <td colSpan="8" className="no-results">
                       No transactions found matching your filters
                     </td>
                   </tr>
@@ -379,7 +378,6 @@ function Ledger() {
                         className="transaction-row"
                       >
                         <td className="order-number">#{order.dailyOrderNumber || '-'}</td>
-                        <td>{order.id}</td>
                         <td className="receipt-id-cell">{receiptId}</td>
                         <td>{formatDateOnly(order.orderDate)}</td>
                         <td>{formatTimeOnly(order.orderDate)}</td>

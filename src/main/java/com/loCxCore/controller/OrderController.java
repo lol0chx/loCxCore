@@ -50,6 +50,11 @@ public class OrderController {
                     // Create pizza
                     Pizza pizza = new Pizza(0, size, crust, sauce, cheese);
                     
+                    // Set signature pizza name if provided
+                    if (itemDTO.getSignatureName() != null && !itemDTO.getSignatureName().isEmpty()) {
+                        pizza.setSignaturePizzaName(itemDTO.getSignatureName());
+                    }
+                    
                     // Add toppings
                     if (itemDTO.getToppings() != null) {
                         for (String toppingName : itemDTO.getToppings()) {

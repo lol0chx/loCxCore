@@ -9,6 +9,7 @@ public class OrderItemDTO {
     private String sauce;
     private String cheese;
     private List<String> toppings;
+    private String signatureName;
 
     public OrderItemDTO() {
     }
@@ -59,5 +60,13 @@ public class OrderItemDTO {
 
     public void setToppings(List<String> toppings) {
         this.toppings = toppings;
+    }
+
+    public String getSignatureName() {
+        return signatureName;
+    }
+
+    public void setSignatureName(String signatureName) {
+        this.signatureName = signatureName;
     }
 }

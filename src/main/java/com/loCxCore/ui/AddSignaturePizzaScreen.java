@@ -71,8 +71,8 @@ public class AddSignaturePizzaScreen {
             System.out.println("\nCrust: " + pizza.getCrust());
             System.out.println("Sauce: " + pizza.getSauce());
             System.out.println("Current toppings:");
-            pizza.getToppingsMap().forEach((topping, count) -> 
-                System.out.println("  - " + topping.getName() + (count > 1 ? " x" + count : ""))
+            pizza.getToppingsMap().forEach((toppingName, count) -> 
+                System.out.println("  - " + toppingName + (count > 1 ? " x" + count : ""))
             );
             System.out.println("\n1: Change Crust");
             System.out.println("2: Change Sauce");
@@ -119,7 +119,7 @@ public class AddSignaturePizzaScreen {
         boolean done = false;
         while (!done) {
             // Rebuild the list each time to reflect current state
-            List<ToppingOption> currentToppings = new ArrayList<>(pizza.getToppingsMap().keySet());
+            List<ToppingOption> currentToppings = new ArrayList<>(pizza.getToppings().getAll().keySet());
             
             if (currentToppings.isEmpty()) {
                 System.out.println("✅ All toppings removed!");
@@ -129,7 +129,7 @@ public class AddSignaturePizzaScreen {
             System.out.println("\n🗑️ --- Remove Toppings ---");
             for (int i = 0; i < currentToppings.size(); i++) {
                 ToppingOption topping = currentToppings.get(i);
-                int count = pizza.getToppingsMap().get(topping);
+                int count = pizza.getToppings().getAll().get(topping);
                 System.out.printf("%d: %s%s\n", i + 1, topping.getName(), 
                     count > 1 ? " (x" + count + ")" : "");
             }

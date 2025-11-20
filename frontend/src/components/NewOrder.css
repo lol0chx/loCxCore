@@ -193,6 +193,24 @@
   margin: 0;
 }
 
+.customer-info-checkout {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 16px 0;
+  border: 2px solid #667eea;
+}
+
+.customer-info-checkout h3 {
+  margin: 0 0 12px 0;
+  color: #667eea;
+  font-size: 18px;
+}
+
+.customer-info-checkout .customer-input {
+  margin-top: 0;
+}
+
 /* Payment Modal */
 .modal-overlay {
   position: fixed;
@@ -278,4 +296,298 @@
 
 .modal-actions button {
   flex: 1;
+}
+
+/* Pizza Mode Toggle */
+.pizza-mode-toggle {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.toggle-btn.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+/* Signature Pizza Grid */
+.signature-pizza-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.signature-pizza-card {
+  padding: 16px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.signature-pizza-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border-color: #667eea;
+}
+
+.signature-pizza-card.selected {
+  border-color: #667eea;
+  background: #f0f4ff;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.signature-pizza-card h3 {
+  color: #333;
+  margin: 0 0 8px 0;
+  font-size: 16px;
+}
+
+.signature-description {
+  color: #666;
+  font-size: 13px;
+  margin: 8px 0;
+  line-height: 1.4;
+}
+
+.signature-toppings {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+  font-size: 11px;
+  color: #888;
+  font-style: italic;
+}
+
+/* Signature Customization */
+.signature-customization {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border: 2px solid #e0e0e0;
+}
+
+.signature-customization h3 {
+  color: #667eea;
+  margin: 0 0 16px 0;
+  font-size: 18px;
+}
+
+.config-item-box {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 16px;
+  border: 1px solid #ddd;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Pizza Preview */
+.pizza-preview-card {
+  margin-top: 24px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 3px solid #667eea;
+}
+
+.pizza-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.pizza-visual {
+  position: relative;
+  transition: all 0.5s ease;
+}
+
+.pizza-size-small {
+  width: 150px;
+  height: 150px;
+}
+
+.pizza-size-medium {
+  width: 200px;
+  height: 200px;
+}
+
+.pizza-size-large {
+  width: 250px;
+  height: 250px;
+}
+
+.pizza-base {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #f4d6a8;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+/* Sauce layers */
+.pizza-sauce {
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.sauce-marinara {
+  background: radial-gradient(circle, #d32f2f, #c62828);
+}
+
+.sauce-bbq {
+  background: radial-gradient(circle, #8b4513, #654321);
+}
+
+.sauce-white_garlic {
+  background: radial-gradient(circle, #f5f5dc, #e8e8cc);
+}
+
+.sauce-pesto {
+  background: radial-gradient(circle, #4a7c4e, #3a6b3e);
+}
+
+/* Cheese layer */
+.pizza-cheese {
+  position: absolute;
+  top: 12%;
+  left: 12%;
+  width: 76%;
+  height: 76%;
+  border-radius: 50%;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.cheese-mozzarella {
+  background: radial-gradient(circle, #fff8dc, #f5e6c8);
+}
+
+.cheese-cheddar {
+  background: radial-gradient(circle, #ffa500, #ff8c00);
+}
+
+.cheese-parmesan {
+  background: radial-gradient(circle, #f0e68c, #daa520);
+}
+
+.cheese-vegan {
+  background: radial-gradient(circle, #f5f5dc, #e0e0c0);
+}
+
+/* Toppings */
+.pizza-toppings {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.topping {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Topping colors */
+.topping-pepperoni { background: #c41e3a; }
+.topping-mushrooms { background: #d4a574; }
+.topping-onions { background: #f8f0e3; border: 2px solid #daa520; }
+.topping-italian-sausage { background: #8b4513; }
+.topping-bacon { background: #d2691e; }
+.topping-olives { background: #2f4f2f; }
+.topping-bell-peppers { background: #228b22; }
+.topping-pineapple { background: #ffff00; }
+.topping-spinach { background: #355e3b; }
+.topping-tomatoes { background: #ff6347; }
+.topping-ham { background: #ffb6c1; }
+.topping-chicken { background: #f5deb3; }
+.topping-beef { background: #8b0000; }
+.topping-garlic { background: #f5f5dc; border: 2px solid #daa520; }
+.topping-basil { background: #50c878; }
+.topping-jalapeños { background: #228b22; }
+.topping-extra-cheese { background: #fff8dc; opacity: 0.6; width: 25px; height: 25px; }
+.topping-salami { background: #a0522d; }
+.topping-anchovies { background: #708090; }
+.topping-artichokes { background: #8fbc8f; }
+.topping-sun-dried-tomatoes { background: #8b0000; }
+
+/* Crust styles */
+.pizza-crust {
+  position: absolute;
+  top: -5%;
+  left: -5%;
+  width: 110%;
+  height: 110%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.crust-regular {
+  border: 8px solid #d4a574;
+}
+
+.crust-thin {
+  border: 4px solid #d4a574;
+}
+
+.crust-thick {
+  border: 12px solid #d4a574;
+}
+
+.crust-stuffed {
+  border: 10px solid #f4d6a8;
+  box-shadow: 0 0 0 3px #c8a668, 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+/* Pizza info */
+.pizza-info {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.size-label {
+  font-size: 20px;
+  font-weight: bold;
+  color: #667eea;
+  margin: 8px 0;
+  text-transform: capitalize;
+}
+
+.signature-label {
+  font-size: 16px;
+  color: #ff9800;
+  margin: 4px 0;
+  font-weight: 600;
 }

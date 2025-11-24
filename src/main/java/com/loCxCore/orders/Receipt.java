@@ -6,11 +6,14 @@ import com.loCxCore.menu.drink.Drink;
 import com.loCxCore.menu.GarlicKnots;
 import com.loCxCore.menu.pizza.Pizza;
 import com.loCxCore.menu.pizza.topping.ToppingOption;
-import com.loCxCore.ui.CheckOutScreen;
 import com.loCxCore.services.PriceCalculator;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,9 +23,18 @@ import java.util.Map;
 public class Receipt {
     private final Order order;
     private final List<String> notes = new ArrayList<>();
+    private Double cashTendered;
+    private Double cashChange;
 
     public Receipt (Order order) {
         this.order = order;
+    }
+    
+    // Constructor for web-based orders with payment details
+    public Receipt(Order order, double cashTendered, double cashChange) {
+        this.order = order;
+        this.cashTendered = cashTendered;
+        this.cashChange = cashChange;
     }
 
     // Generates formatted receipt text with header, items, and footer
@@ -52,11 +64,14 @@ public class Receipt {
         }
 
         // Iterate through all items and format each type
-        List<Orderable> items = order.getItems();
+        List<Orderable> items = new ArrayList<>(order.getItems());
         for (Orderable item : items) {
             // Format pizza with size, crust, toppings, and sides
             if (item instanceof Pizza pizza) {
-                receipt.append("\n  🍕 [").append(itemNumber++).append("] ").append(pizza.getName()).append("\n");
+                String pizzaName = pizza.getSignaturePizzaName() != null && !pizza.getSignaturePizzaName().isEmpty() 
+                    ? "⭐ " + pizza.getSignaturePizzaName() 
+                    : pizza.getName();
+                receipt.append("\n  🍕 [").append(itemNumber++).append("] ").append(pizzaName).append("\n");
                 receipt.append("     Size: ").append(pizza.getSize()).append(" - $").append(String.format("%.2f", pizza.getBasePrice())).append("\n");
                 receipt.append("     Crust: ").append(pizza.getCrust());
                 if (pizza.getCrust().getExtraCost() > 0) {
@@ -64,7 +79,7 @@ public class Receipt {
                 }
                 receipt.append("\n     Sauce: ").append(pizza.getSauce()).append("\n");
                 receipt.append("     Cheese: ").append(pizza.getCheese()).append("\n");
-                Map<ToppingOption, Integer> toppings = pizza.getToppingsMap();
+                Map<String, Integer> toppings = pizza.getToppingsMap();
                 if (toppings.isEmpty()) {
                     receipt.append("     Toppings: None\n");
                 } else {
@@ -72,14 +87,17 @@ public class Receipt {
                     // Apply size multiplier to topping prices
                     PizzaSize size = pizza.getSize();
                     double multiplier = size != null ? size.getToppingMultiplier() : 1.0;
-                    toppings.forEach((topping, count) -> {
-                        double adjustedPrice = topping.getPrice() * multiplier;
-                        receipt.append("       • ").append(topping.getName())
-                                .append(" ($").append(String.format("%.2f", adjustedPrice));
-                        if (count > 1) {
-                            receipt.append(" x").append(count);
+                    toppings.forEach((toppingName, count) -> {
+                        ToppingOption topping = com.loCxCore.menu.pizza.topping.ToppingMenu.getToppingByName(toppingName);
+                        if (topping != null) {
+                            double adjustedPrice = topping.getPrice() * multiplier;
+                            receipt.append("       • ").append(toppingName)
+                                    .append(" ($").append(String.format("%.2f", adjustedPrice));
+                            if (count > 1) {
+                                receipt.append(" x").append(count);
+                            }
+                            receipt.append(")\n");
                         }
-                        receipt.append(")\n");
                     });
                 }
                 // Display sides if any
@@ -114,9 +132,10 @@ public class Receipt {
         receipt.append("  SUBTOTAL: $").append(String.format("%.2f", total)).append("\n");
 
         // Add cash payment details only when finalizing (includeThanks means it's checkout)
-        if(includeThanks && CheckOutScreen.getTendered() > 0) {
-            receipt.append("  Cash Tendered: $").append(String.format("%.2f", CheckOutScreen.getTendered())).append("\n");
-            receipt.append("  Change: $").append(String.format("%.2f", CheckOutScreen.getChange())).append("\n");
+        // Web-based payment details
+        if(includeThanks && cashTendered != null && cashTendered > 0) {
+            receipt.append("  Cash Tendered: $").append(String.format("%.2f", cashTendered)).append("\n");
+            receipt.append("  Change: $").append(String.format("%.2f", cashChange)).append("\n");
         }
 
         if (!notes.isEmpty()) {
@@ -146,14 +165,29 @@ public class Receipt {
     // Saves receipt to file in receipts directory
     public void saveToFile(String filename) {
         String content = generate(true); // Include thank you message when saving
-        try (FileWriter writer = new FileWriter("receipts/" + filename)) {
-            writer.write(content);
-            System.out.println("Receipt saved\n\n\n\n\n\n\n\n\n\n\n");
+        
+        // Ensure receipts directory exists
+        Path receiptsDir = Paths.get("receipts");
+        try {
+            if (!Files.exists(receiptsDir)) {
+                Files.createDirectories(receiptsDir);
+                System.out.println("Created receipts directory: " + receiptsDir.toAbsolutePath());
+            }
         } catch (IOException e) {
-            System.err.println("Failed to save receipt: " + e.getMessage());
+            System.err.println("Failed to create receipts directory: " + e.getMessage());
         }
         
-        // Save transaction summary to transactions.txt
+        // Save receipt file
+        Path receiptPath = receiptsDir.resolve(filename);
+        try (FileWriter writer = new FileWriter(receiptPath.toFile())) {
+            writer.write(content);
+            System.out.println("Receipt saved to: " + receiptPath.toAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("Failed to save receipt to " + receiptPath.toAbsolutePath() + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        // Save transaction summary to transactions.csv
         saveTransactionSummary(filename);
     }
     
@@ -163,15 +197,18 @@ public class Receipt {
         LocalDateTime now = LocalDateTime.now();
         String date = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         String time = now.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        double total = PriceCalculator.calculateTotal(order.getItems());
+        double total = PriceCalculator.calculateTotal(new ArrayList<>(order.getItems()));
         
         String transactionLine = String.format("%s|%s|%s|%s|%.2f%n", 
             receiptId, date, time, customerName, total);
         
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true))) {
+        Path transactionsPath = Paths.get("transactions.csv");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(transactionsPath.toFile(), true))) {
             writer.write(transactionLine);
+            System.out.println("Transaction saved to: " + transactionsPath.toAbsolutePath());
         } catch (IOException e) {
-            System.err.println("Failed to save transaction: " + e.getMessage());
+            System.err.println("Failed to save transaction to " + transactionsPath.toAbsolutePath() + ": " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

@@ -1,0 +1,394 @@
+.ledger-container {
+  padding: 40px 20px;
+  min-height: calc(100vh - 70px);
+}
+
+.loading {
+  text-align: center;
+  color: white;
+  font-size: 20px;
+  padding: 40px;
+}
+
+.error-message {
+  background: #f56565;
+  color: white;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.empty-message {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+  font-size: 18px;
+  font-style: italic;
+}
+
+/* Filter Section */
+.filter-section {
+  margin-bottom: 24px;
+  padding: 24px;
+}
+
+.filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.search-box {
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.filter-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 10px 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  min-width: 140px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.clear-btn {
+  padding: 10px 20px;
+  white-space: nowrap;
+}
+
+.results-count {
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Transactions Table */
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table thead {
+  background: #667eea;
+  color: white;
+}
+
+.transactions-table th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.transactions-table td {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+  color: #333;
+}
+
+.transaction-row {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.transaction-row:hover {
+  background: #f5f7ff;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.paid {
+  background: #48bb78;
+  color: white;
+}
+
+.status-badge.pending {
+  background: #f6ad55;
+  color: white;
+}
+
+.btn-view {
+  padding: 8px 20px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-view:hover {
+  background: #5568d3;
+  transform: translateY(-1px);
+}
+
+.no-results {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 60px !important;
+  font-size: 16px;
+}
+
+/* Order Detail View */
+.back-btn {
+  margin-bottom: 24px;
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+.order-detail-card {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.order-detail-card .order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #667eea;
+}
+
+.order-detail-card h2 {
+  color: #333;
+  margin: 0;
+  font-size: 28px;
+}
+
+.receipt-id-subtitle {
+  color: #999;
+  font-size: 14px;
+  margin: 4px 0 0 0;
+  font-weight: normal;
+}
+
+.order-number {
+  font-weight: 700;
+  color: #667eea;
+  font-size: 16px;
+}
+
+.receipt-id-cell {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #555;
+}
+
+.order-detail-card .status {
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.order-detail-card .status.paid {
+  background: #48bb78;
+  color: white;
+}
+
+.order-detail-card .status.pending {
+  background: #f6ad55;
+  color: white;
+}
+
+.order-info {
+  margin-bottom: 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.order-info p {
+  margin: 0;
+  font-size: 16px;
+  color: #666;
+  background: #f9f9f9;
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.order-info strong {
+  color: #333;
+}
+
+.order-items {
+  margin: 32px 0;
+}
+
+.order-items h3 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 22px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 12px;
+}
+
+.item-detail {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border-left: 4px solid #667eea;
+}
+
+.item-detail h4 {
+  color: #667eea;
+  margin: 0 0 16px 0;
+  font-size: 18px;
+}
+
+.item-detail p {
+  margin: 8px 0;
+  color: #666;
+  font-size: 15px;
+}
+
+.item-detail strong {
+  color: #333;
+  min-width: 80px;
+  display: inline-block;
+}
+
+.toppings-detail {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #ddd;
+}
+
+.toppings-detail strong {
+  color: #333;
+  font-size: 15px;
+}
+
+.toppings-detail ul {
+  margin: 12px 0 0 0;
+  padding-left: 20px;
+}
+
+.toppings-detail li {
+  color: #48bb78;
+  margin: 6px 0;
+  font-weight: 500;
+}
+
+.item-price {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 2px solid #ddd;
+  font-size: 16px;
+  color: #667eea;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 3px solid #eee;
+}
+
+.order-total-large {
+  font-size: 28px;
+  color: #667eea;
+  font-weight: 700;
+}
+
+@media (max-width: 968px) {
+  .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-select {
+    width: 100%;
+  }
+  
+  .transactions-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .order-footer {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .order-footer button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .transactions-table {
+    font-size: 13px;
+  }
+  
+  .transactions-table th,
+  .transactions-table td {
+    padding: 10px 8px;
+  }
+  
+  .order-detail-card {
+    padding: 20px;
+  }
+  
+  .order-detail-card h2 {
+    font-size: 22px;
+  }
+  
+  .order-info {
+    grid-template-columns: 1fr;
+  }
+}

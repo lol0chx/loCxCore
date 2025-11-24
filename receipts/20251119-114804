@@ -1,0 +1,30 @@
+
+═══════════════════════════════════════
+          🍕 PIZZAPOINT 🍕
+═══════════════════════════════════════
+
+  Customer: john
+  Date: 2025-11-19 11:48:04
+  Items: 1
+
+═══════════════════════════════════════
+
+  🍕 [1] Custom Pizza 
+     Size: LARGE - $27.99
+     Crust: REGULAR
+     Sauce: MARINARA
+     Cheese: CHEDDAR
+     Toppings:
+       • Pepperoni ($3.00 x2)
+       • Onions ($1.00)
+       • Mushrooms ($2.00)
+     ───────────────────
+     Total: $27.99
+
+═══════════════════════════════════════
+  SUBTOTAL: $27.99
+  Cash Tendered: $30.00
+  Change: $2.01
+═══════════════════════════════════════
+     Thank you for your order! 🍕
+═══════════════════════════════════════

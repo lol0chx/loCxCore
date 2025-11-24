@@ -6,7 +6,6 @@ import com.loCxCore.menu.drink.Drink;
 import com.loCxCore.menu.GarlicKnots;
 import com.loCxCore.menu.pizza.Pizza;
 import com.loCxCore.menu.pizza.topping.ToppingOption;
-import com.loCxCore.ui.CheckOutScreen;
 import com.loCxCore.services.PriceCalculator;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -133,15 +132,10 @@ public class Receipt {
         receipt.append("  SUBTOTAL: $").append(String.format("%.2f", total)).append("\n");
 
         // Add cash payment details only when finalizing (includeThanks means it's checkout)
-        // First check if web-based payment details are available
+        // Web-based payment details
         if(includeThanks && cashTendered != null && cashTendered > 0) {
             receipt.append("  Cash Tendered: $").append(String.format("%.2f", cashTendered)).append("\n");
             receipt.append("  Change: $").append(String.format("%.2f", cashChange)).append("\n");
-        } 
-        // Fallback to CLI-based static payment details
-        else if(includeThanks && CheckOutScreen.getTendered() > 0) {
-            receipt.append("  Cash Tendered: $").append(String.format("%.2f", CheckOutScreen.getTendered())).append("\n");
-            receipt.append("  Change: $").append(String.format("%.2f", CheckOutScreen.getChange())).append("\n");
         }
 
         if (!notes.isEmpty()) {

@@ -298,6 +298,13 @@
   flex: 1;
 }
 
+/* Order Mode Toggle */
+.order-mode-toggle {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
 /* Pizza Mode Toggle */
 .pizza-mode-toggle {
   display: flex;
@@ -325,6 +332,17 @@
   background: #667eea;
   color: white;
   border-color: #667eea;
+}
+
+/* Price Display */
+.price-display {
+  margin: 20px 0;
+  padding: 16px;
+  background: #f0f4ff;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 18px;
+  color: #333;
 }
 
 /* Signature Pizza Grid */

@@ -77,18 +77,6 @@ function Ledger() {
     setFilteredOrders(filtered)
   }
 
-  const deleteOrder = async (id) => {
-    if (window.confirm('Are you sure you want to delete this order?')) {
-      try {
-        await orderAPI.deleteOrder(id)
-        setSelectedOrder(null)
-        fetchOrders()
-      } catch (err) {
-        alert('Failed to delete order')
-      }
-    }
-  }
-
   const formatDate = (dateString) => {
     const date = new Date(dateString)
     return date.toLocaleString('en-US', {
@@ -190,6 +178,33 @@ function Ledger() {
                 {selectedOrder.items.map((item, index) => {
                   console.log(`Item ${index + 1}:`, item)
                   
+                  // Check item type from discriminator column
+                  const itemType = item.itemType || 'PIZZA'
+                  
+                  // Render Drink
+                  if (itemType === 'DRINK') {
+                    const drinkSize = typeof item.size === 'string' ? item.size : (item.size?.name || 'N/A')
+                    return (
+                      <div key={index} className="item-detail">
+                        <h4>🥤 {item.drinkName || item.name}</h4>
+                        <p><strong>Size:</strong> {drinkSize}</p>
+                        <p className="item-price"><strong>Total:</strong> ${item.basePrice?.toFixed(2) || '0.00'}</p>
+                      </div>
+                    )
+                  }
+                  
+                  // Render Garlic Knots
+                  if (itemType === 'GARLIC_KNOTS') {
+                    return (
+                      <div key={index} className="item-detail">
+                        <h4>🧄 {item.name}</h4>
+                        <p><strong>Quantity:</strong> {item.quantity || 1}</p>
+                        <p className="item-price"><strong>Total:</strong> ${item.basePrice?.toFixed(2) || '0.00'}</p>
+                      </div>
+                    )
+                  }
+                  
+                  // Render Pizza (default)
                   // Handle both string and object enum values
                   const size = typeof item.size === 'string' ? item.size : (item.size?.name || 'N/A')
                   const crust = typeof item.crust === 'string' ? item.crust : (item.crust?.name || 'N/A')
@@ -245,12 +260,6 @@ function Ledger() {
               <div className="order-total-large">
                 <strong>Total:</strong> ${selectedOrder.totalPrice?.toFixed(2) || '0.00'}
               </div>
-              <button
-                onClick={() => deleteOrder(selectedOrder.id)}
-                className="btn-danger"
-              >
-                Delete Order
-              </button>
             </div>
           </div>
         </div>

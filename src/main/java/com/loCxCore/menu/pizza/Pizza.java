@@ -230,4 +230,9 @@ public class Pizza extends MenuItem implements Customizable<ToppingOption> {
             case LARGE -> 2.0;
         };
     }
+
+    @JsonProperty("itemType")
+    public String getItemType() {
+        return "PIZZA";
+    }
 }

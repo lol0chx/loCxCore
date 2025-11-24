@@ -38,7 +38,7 @@ public class OrderController {
 
             double totalPrice = 0.0;
 
-            // Convert DTOs to Pizza entities
+            // Convert DTOs to MenuItem entities
             for (OrderItemDTO itemDTO : orderRequest.getItems()) {
                 if ("pizza".equalsIgnoreCase(itemDTO.getType())) {
                     // Parse enums from strings
@@ -72,6 +72,26 @@ public class OrderController {
                     pizza.setBasePrice(pizzaPrice);
                     totalPrice += pizzaPrice;
                     order.addItem(pizza);
+                    
+                } else if ("drink".equalsIgnoreCase(itemDTO.getType())) {
+                    // Create drink
+                    DrinkSize drinkSize = DrinkSize.valueOf(itemDTO.getDrinkSize().toUpperCase());
+                    com.loCxCore.menu.drink.Drink drink = new com.loCxCore.menu.drink.Drink(itemDTO.getDrinkName(), drinkSize);
+                    
+                    double drinkPrice = drink.calculatePrice();
+                    drink.setBasePrice(drinkPrice);
+                    totalPrice += drinkPrice;
+                    order.addItem(drink);
+                    
+                } else if ("garlicknots".equalsIgnoreCase(itemDTO.getType())) {
+                    // Create garlic knots
+                    int quantity = itemDTO.getQuantity() != null ? itemDTO.getQuantity() : 1;
+                    com.loCxCore.menu.GarlicKnots garlicKnots = new com.loCxCore.menu.GarlicKnots(quantity);
+                    
+                    double garlicKnotsPrice = garlicKnots.calculatePrice();
+                    garlicKnots.setBasePrice(garlicKnotsPrice);
+                    totalPrice += garlicKnotsPrice;
+                    order.addItem(garlicKnots);
                 }
             }
 
@@ -92,7 +112,6 @@ public class OrderController {
                 String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
                 String receiptId = createdOrder.getId() + "-" + timestamp;
                 receipt.saveToFile(receiptId);
-                System.out.println("Receipt saved: " + receiptId);
             } catch (Exception receiptError) {
                 System.err.println("Failed to save receipt: " + receiptError.getMessage());
                 receiptError.printStackTrace();
@@ -111,7 +130,6 @@ public class OrderController {
     public ResponseEntity<List<Order>> getAllOrders() {
         try {
             List<Order> orders = orderService.getAllOrders();
-            System.out.println("Fetched " + orders.size() + " orders");
             return new ResponseEntity<>(orders, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

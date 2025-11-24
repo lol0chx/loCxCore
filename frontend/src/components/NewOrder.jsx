@@ -4,6 +4,7 @@ import './NewOrder.css'
 
 function NewOrder() {
   const [customerName, setCustomerName] = useState('')
+  const [orderMode, setOrderMode] = useState('pizza') // 'pizza', 'drink', or 'garlicknots'
   const [pizzaMode, setPizzaMode] = useState('custom') // 'custom' or 'signature'
   const [selectedSignaturePizza, setSelectedSignaturePizza] = useState('')
   const [currentItem, setCurrentItem] = useState({
@@ -14,11 +15,28 @@ function NewOrder() {
     cheese: '',
     toppings: {} // Changed to object to track quantities: { 'Pepperoni': 2, 'Mushrooms': 1 }
   })
+  const [currentDrink, setCurrentDrink] = useState({
+    type: 'drink',
+    drinkName: '',
+    drinkSize: ''
+  })
+  const [currentGarlicKnots, setCurrentGarlicKnots] = useState({
+    type: 'garlicknots',
+    quantity: 1
+  })
   const [cart, setCart] = useState([])
   const [message, setMessage] = useState('')
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('')
   const [cashAmount, setCashAmount] = useState('')
+
+  const drinkOptions = ['Coke', 'Sprite', 'Water', 'Fanta']
+  const drinkSizes = {
+    SMALL: 1.00,
+    MEDIUM: 1.49,
+    LARGE: 1.99
+  }
+  const garlicKnotsPrice = 5.00
 
   const signaturePizzas = {
     'Meat Lovers': {
@@ -106,27 +124,64 @@ function NewOrder() {
   }
 
   const addToCart = () => {
-    // Validate all required fields are selected
-    if (!currentItem.size || !currentItem.crust || !currentItem.sauce || !currentItem.cheese) {
-      setMessage('❌ Please select Size, Crust, Sauce, and Cheese!')
-      setTimeout(() => setMessage(''), 3000)
-      return
-    }
+    if (orderMode === 'pizza') {
+      // Validate all required fields are selected
+      if (!currentItem.size || !currentItem.crust || !currentItem.sauce || !currentItem.cheese) {
+        setMessage('❌ Please select Size, Crust, Sauce, and Cheese!')
+        setTimeout(() => setMessage(''), 3000)
+        return
+      }
 
-    setCart([...cart, { ...currentItem, id: Date.now() }])
-    setMessage('✅ Item added to cart!')
-    setTimeout(() => setMessage(''), 3000)
-    
-    // Reset to empty selections for next pizza
-    setCurrentItem({
-      type: 'pizza',
-      size: '',
-      crust: '',
-      sauce: '',
-      cheese: '',
-      toppings: {}
-    })
-    setSelectedSignaturePizza('')
+      setCart([...cart, { ...currentItem, id: Date.now() }])
+      setMessage('✅ Pizza added to cart!')
+      setTimeout(() => setMessage(''), 3000)
+      
+      // Reset to empty selections for next pizza
+      setCurrentItem({
+        type: 'pizza',
+        size: '',
+        crust: '',
+        sauce: '',
+        cheese: '',
+        toppings: {}
+      })
+      setSelectedSignaturePizza('')
+    } else if (orderMode === 'drink') {
+      // Validate drink selection
+      if (!currentDrink.drinkName || !currentDrink.drinkSize) {
+        setMessage('❌ Please select a drink and size!')
+        setTimeout(() => setMessage(''), 3000)
+        return
+      }
+
+      setCart([...cart, { ...currentDrink, id: Date.now() }])
+      setMessage('✅ Drink added to cart!')
+      setTimeout(() => setMessage(''), 3000)
+      
+      // Reset drink selection
+      setCurrentDrink({
+        type: 'drink',
+        drinkName: '',
+        drinkSize: ''
+      })
+    } else if (orderMode === 'garlicknots') {
+      // Validate garlic knots quantity
+      if (!currentGarlicKnots.quantity || currentGarlicKnots.quantity < 1) {
+        setMessage('❌ Please select a valid quantity!')
+        setTimeout(() => setMessage(''), 3000)
+        return
+      }
+
+      setCart([...cart, { ...currentGarlicKnots, id: Date.now() }])
+      setMessage('✅ Garlic Knots added to cart!')
+      setTimeout(() => setMessage(''), 3000)
+      
+      // Reset quantity
+      setCurrentGarlicKnots({
+        type: 'garlicknots',
+        quantity: 1
+      })
+    }
   }
 
   const removeFromCart = (id) => {
@@ -204,6 +259,10 @@ function NewOrder() {
           const toppingPrice = toppingPrices[topping] || 1.0
           total += (toppingPrice * toppingMultiplier * count)
         })
+      } else if (item.type === 'drink') {
+        total += drinkSizes[item.drinkSize] || 0
+      } else if (item.type === 'garlicknots') {
+        total += garlicKnotsPrice * (item.quantity || 1)
       }
     })
     return total.toFixed(2)
@@ -251,16 +310,32 @@ function NewOrder() {
     try {
       const orderData = {
         customerName: customerName,
-        items: cart.map(item => ({
-          type: item.type,
-          size: item.size,
-          crust: item.crust,
-          sauce: item.sauce,
-          cheese: item.cheese,
-          signatureName: item.signatureName || null,
-          toppings: Object.entries(item.toppings)
-            .flatMap(([topping, count]) => Array(count).fill(topping))
-        })),
+        items: cart.map(item => {
+          if (item.type === 'pizza') {
+            return {
+              type: item.type,
+              size: item.size,
+              crust: item.crust,
+              sauce: item.sauce,
+              cheese: item.cheese,
+              signatureName: item.signatureName || null,
+              toppings: Object.entries(item.toppings)
+                .flatMap(([topping, count]) => Array(count).fill(topping))
+            }
+          } else if (item.type === 'drink') {
+            return {
+              type: item.type,
+              drinkName: item.drinkName,
+              drinkSize: item.drinkSize
+            }
+          } else if (item.type === 'garlicknots') {
+            return {
+              type: item.type,
+              quantity: item.quantity
+            }
+          }
+          return item
+        }),
         orderDate: new Date().toISOString(),
         cashTendered: cash,
         cashChange: change
@@ -279,8 +354,10 @@ function NewOrder() {
       
       setTimeout(() => setMessage(''), 5000)
     } catch (error) {
-      setMessage('❌ Error placing order. Please try again.')
       console.error('Order error:', error)
+      console.error('Error details:', error.response?.data)
+      console.error('Order data sent:', orderData)
+      setMessage('❌ Error placing order. Please try again.')
     }
   }
 
@@ -300,44 +377,71 @@ function NewOrder() {
 
         <div className="order-grid">
           <div className="order-section">
+            {/* Order Mode Selection */}
             <div className="card">
-              <h2>Build Your Pizza</h2>
-              
-              {/* Pizza Mode Toggle */}
-              <div className="form-group">
-                <label>Pizza Type</label>
-                <div className="pizza-mode-toggle">
-                  <button 
-                    className={`toggle-btn ${pizzaMode === 'custom' ? 'active' : ''}`}
-                    onClick={() => {
-                      setPizzaMode('custom')
-                      setSelectedSignaturePizza('')
-                      setCurrentItem({
-                        type: 'pizza',
-                        size: currentItem.size,
-                        crust: '',
-                        sauce: '',
-                        cheese: '',
-                        toppings: {}
-                      })
-                    }}
-                  >
-                    🍕 Custom Pizza
-                  </button>
-                  <button 
-                    className={`toggle-btn ${pizzaMode === 'signature' ? 'active' : ''}`}
-                    onClick={() => {
-                      setPizzaMode('signature')
-                      setCurrentItem({
-                        type: 'pizza',
-                        size: currentItem.size,
-                        crust: '',
-                        sauce: '',
-                        cheese: '',
-                        toppings: {}
-                      })
-                    }}
-                  >
+              <h2>What would you like to order?</h2>
+              <div className="order-mode-toggle">
+                <button 
+                  className={`toggle-btn ${orderMode === 'pizza' ? 'active' : ''}`}
+                  onClick={() => setOrderMode('pizza')}
+                >
+                  🍕 Pizza
+                </button>
+                <button 
+                  className={`toggle-btn ${orderMode === 'drink' ? 'active' : ''}`}
+                  onClick={() => setOrderMode('drink')}
+                >
+                  🥤 Drinks
+                </button>
+                <button 
+                  className={`toggle-btn ${orderMode === 'garlicknots' ? 'active' : ''}`}
+                  onClick={() => setOrderMode('garlicknots')}
+                >
+                  🧄 Garlic Knots
+                </button>
+              </div>
+            </div>
+
+            {/* Pizza Section */}
+            {orderMode === 'pizza' && (
+              <div className="card">
+                <h2>Build Your Pizza</h2>
+                
+                {/* Pizza Mode Toggle */}
+                <div className="form-group">
+                  <label>Pizza Type</label>
+                  <div className="pizza-mode-toggle">
+                    <button 
+                      className={`toggle-btn ${pizzaMode === 'custom' ? 'active' : ''}`}
+                      onClick={() => {
+                        setPizzaMode('custom')
+                        setSelectedSignaturePizza('')
+                        setCurrentItem({
+                          type: 'pizza',
+                          size: currentItem.size,
+                          crust: '',
+                          sauce: '',
+                          cheese: '',
+                          toppings: {}
+                        })
+                      }}
+                    >
+                      🍕 Custom Pizza
+                    </button>
+                    <button 
+                      className={`toggle-btn ${pizzaMode === 'signature' ? 'active' : ''}`}
+                      onClick={() => {
+                        setPizzaMode('signature')
+                        setCurrentItem({
+                          type: 'pizza',
+                          size: currentItem.size,
+                          crust: '',
+                          sauce: '',
+                          cheese: '',
+                          toppings: {}
+                        })
+                      }}
+                    >
                     ⭐ Signature Pizza
                   </button>
                 </div>
@@ -528,10 +632,85 @@ function NewOrder() {
               <button onClick={addToCart} className="btn-primary full-width">
                 Add to Cart
               </button>
-            </div>
+              </div>
+            )}
+
+            {/* Drinks Section */}
+            {orderMode === 'drink' && (
+              <div className="card">
+                <h2>Select a Drink</h2>
+                
+                <div className="form-group">
+                  <label>Drink *</label>
+                  <select
+                    value={currentDrink.drinkName}
+                    onChange={(e) => setCurrentDrink({ ...currentDrink, drinkName: e.target.value })}
+                    required
+                  >
+                    <option value="" disabled>-- Select Drink --</option>
+                    {drinkOptions.map(drink => (
+                      <option key={drink} value={drink}>{drink}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Size *</label>
+                  <select
+                    value={currentDrink.drinkSize}
+                    onChange={(e) => setCurrentDrink({ ...currentDrink, drinkSize: e.target.value })}
+                    required
+                  >
+                    <option value="" disabled>-- Select Size --</option>
+                    <option value="SMALL">Small - ${drinkSizes.SMALL.toFixed(2)}</option>
+                    <option value="MEDIUM">Medium - ${drinkSizes.MEDIUM.toFixed(2)}</option>
+                    <option value="LARGE">Large - ${drinkSizes.LARGE.toFixed(2)}</option>
+                  </select>
+                </div>
+
+                {currentDrink.drinkName && currentDrink.drinkSize && (
+                  <div className="price-display">
+                    <strong>Price: ${drinkSizes[currentDrink.drinkSize].toFixed(2)}</strong>
+                  </div>
+                )}
+
+                <button onClick={addToCart} className="btn-primary full-width">
+                  Add to Cart
+                </button>
+              </div>
+            )}
+
+            {/* Garlic Knots Section */}
+            {orderMode === 'garlicknots' && (
+              <div className="card">
+                <h2>Order Garlic Knots</h2>
+                
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={currentGarlicKnots.quantity}
+                    onChange={(e) => setCurrentGarlicKnots({ ...currentGarlicKnots, quantity: parseInt(e.target.value) || 1 })}
+                    required
+                  />
+                </div>
+
+                <div className="price-display">
+                  <strong>Price per order: ${garlicKnotsPrice.toFixed(2)}</strong>
+                  <br />
+                  <strong>Total: ${(garlicKnotsPrice * currentGarlicKnots.quantity).toFixed(2)}</strong>
+                </div>
+
+                <button onClick={addToCart} className="btn-primary full-width">
+                  Add to Cart
+                </button>
+              </div>
+            )}
 
             {/* Pizza Preview */}
-            {currentItem.size && (
+            {orderMode === 'pizza' && currentItem.size && (
               <div className="card pizza-preview-card">
                 <h2>Pizza Preview</h2>
                 <div className="pizza-preview">
@@ -588,34 +767,69 @@ function NewOrder() {
                 <>
                   <div className="cart-items">
                     {cart.map((item, index) => {
-                      const sizeMultiplier = item.size === 'SMALL' ? 1.0 : item.size === 'MEDIUM' ? 1.5 : 2.0
-                      const stuffedCost = item.crust === 'STUFFED' ? (2.0 * sizeMultiplier).toFixed(2) : null
-                      const pizzaPrice = calculatePizzaPrice(item)
-                      return (
-                        <div key={item.id} className="cart-item">
-                          <div className="item-details">
-                            <h3>{item.signatureName ? `⭐ ${item.signatureName}` : `🍕 Pizza #${index + 1}`}</h3>
-                            <p><strong>Size:</strong> {item.size}</p>
-                            <p><strong>Crust:</strong> {item.crust} {stuffedCost && `(+$${stuffedCost})`}</p>
-                            <p><strong>Sauce:</strong> {item.sauce}</p>
-                            <p><strong>Cheese:</strong> {item.cheese}</p>
-                            {Object.keys(item.toppings).length > 0 && (
-                              <p className="toppings"><strong>Toppings:</strong> {
-                                Object.entries(item.toppings)
-                                  .map(([topping, count]) => count > 1 ? `${topping} (×${count})` : topping)
-                                  .join(', ')
-                              }</p>
-                            )}
-                            <p className="pizza-price"><strong>Pizza Price: ${pizzaPrice}</strong></p>
+                      if (item.type === 'pizza') {
+                        const sizeMultiplier = item.size === 'SMALL' ? 1.0 : item.size === 'MEDIUM' ? 1.5 : 2.0
+                        const stuffedCost = item.crust === 'STUFFED' ? (2.0 * sizeMultiplier).toFixed(2) : null
+                        const pizzaPrice = calculatePizzaPrice(item)
+                        return (
+                          <div key={item.id} className="cart-item">
+                            <div className="item-details">
+                              <h3>{item.signatureName ? `⭐ ${item.signatureName}` : `🍕 Pizza #${index + 1}`}</h3>
+                              <p><strong>Size:</strong> {item.size}</p>
+                              <p><strong>Crust:</strong> {item.crust} {stuffedCost && `(+$${stuffedCost})`}</p>
+                              <p><strong>Sauce:</strong> {item.sauce}</p>
+                              <p><strong>Cheese:</strong> {item.cheese}</p>
+                              {Object.keys(item.toppings).length > 0 && (
+                                <p className="toppings"><strong>Toppings:</strong> {
+                                  Object.entries(item.toppings)
+                                    .map(([topping, count]) => count > 1 ? `${topping} (×${count})` : topping)
+                                    .join(', ')
+                                }</p>
+                              )}
+                              <p className="pizza-price"><strong>Price: ${pizzaPrice}</strong></p>
+                            </div>
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="btn-danger"
+                            >
+                              Remove
+                            </button>
                           </div>
-                          <button
-                            onClick={() => removeFromCart(item.id)}
-                            className="btn-danger"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      )
+                        )
+                      } else if (item.type === 'drink') {
+                        return (
+                          <div key={item.id} className="cart-item">
+                            <div className="item-details">
+                              <h3>🥤 {item.drinkName}</h3>
+                              <p><strong>Size:</strong> {item.drinkSize}</p>
+                              <p className="pizza-price"><strong>Price: ${drinkSizes[item.drinkSize].toFixed(2)}</strong></p>
+                            </div>
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="btn-danger"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        )
+                      } else if (item.type === 'garlicknots') {
+                        return (
+                          <div key={item.id} className="cart-item">
+                            <div className="item-details">
+                              <h3>🧄 Garlic Knots</h3>
+                              <p><strong>Quantity:</strong> {item.quantity}</p>
+                              <p className="pizza-price"><strong>Price: ${(garlicKnotsPrice * item.quantity).toFixed(2)}</strong></p>
+                            </div>
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="btn-danger"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        )
+                      }
+                      return null
                     })}
                   </div>
 

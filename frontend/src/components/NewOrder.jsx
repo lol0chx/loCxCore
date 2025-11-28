@@ -453,7 +453,7 @@ function NewOrder() {
                   <label>Choose Signature Pizza *</label>
                   <div className="signature-pizza-grid">
                     {Object.entries(signaturePizzas).map(([name, details]) => (
-                      <div 
+                      <div
                         key={name}
                         className={`signature-pizza-card ${selectedSignaturePizza === name ? 'selected' : ''}`}
                         onClick={() => selectSignaturePizza(name)}
@@ -468,7 +468,7 @@ function NewOrder() {
                   </div>
                 </div>
               )}
-              
+
               <div className="form-group">
                 <label>Size *</label>
                 <select
@@ -499,8 +499,8 @@ function NewOrder() {
                       <option value="THICK">Thick Crust</option>
                       <option value="STUFFED">
                         Stuffed Crust (+$
-                        {currentItem.size === 'SMALL' ? '2.00' : 
-                         currentItem.size === 'MEDIUM' ? '3.00' : 
+                        {currentItem.size === 'SMALL' ? '2.00' :
+                         currentItem.size === 'MEDIUM' ? '3.00' :
                          currentItem.size === 'LARGE' ? '4.00' : '2.00-4.00'})
                       </option>
                     </select>
@@ -543,7 +543,7 @@ function NewOrder() {
                 <>
                   <div className="signature-customization">
                     <h3>Customize Your {selectedSignaturePizza}</h3>
-                    
+
                     <div className="form-group">
                       <label>Crust</label>
                       <select
@@ -555,8 +555,8 @@ function NewOrder() {
                         <option value="THICK">Thick Crust</option>
                         <option value="STUFFED">
                           Stuffed Crust (+$
-                          {currentItem.size === 'SMALL' ? '2.00' : 
-                           currentItem.size === 'MEDIUM' ? '3.00' : 
+                          {currentItem.size === 'SMALL' ? '2.00' :
+                           currentItem.size === 'MEDIUM' ? '3.00' :
                            currentItem.size === 'LARGE' ? '4.00' : '2.00-4.00'})
                         </option>
                       </select>
@@ -639,7 +639,7 @@ function NewOrder() {
             {orderMode === 'drink' && (
               <div className="card">
                 <h2>Select a Drink</h2>
-                
+
                 <div className="form-group">
                   <label>Drink *</label>
                   <select
@@ -684,7 +684,7 @@ function NewOrder() {
             {orderMode === 'garlicknots' && (
               <div className="card">
                 <h2>Order Garlic Knots</h2>
-                
+
                 <div className="form-group">
                   <label>Quantity *</label>
                   <input
@@ -719,16 +719,16 @@ function NewOrder() {
                     <div className="pizza-base">
                       {/* Sauce layer */}
                       <div className={`pizza-sauce sauce-${currentItem.sauce?.toLowerCase() || 'none'}`}></div>
-                      
+
                       {/* Cheese layer */}
                       <div className={`pizza-cheese cheese-${currentItem.cheese?.toLowerCase() || 'none'}`}></div>
-                      
+
                       {/* Toppings */}
                       <div className="pizza-toppings">
                         {Object.entries(currentItem.toppings).map(([topping, count], idx) => {
                           // Create visual representation for each topping instance
                           return Array.from({ length: Math.min(count, 8) }).map((_, i) => (
-                            <div 
+                            <div
                               key={`${topping}-${i}`}
                               className={`topping topping-${topping.toLowerCase().replace(/\s+/g, '-')}`}
                               style={{
@@ -740,12 +740,12 @@ function NewOrder() {
                           ))
                         })}
                       </div>
-                      
+
                       {/* Crust indicator */}
                       <div className={`pizza-crust crust-${currentItem.crust?.toLowerCase() || 'regular'}`}></div>
                     </div>
                   </div>
-                  
+
                   <div className="pizza-info">
                     <p className="size-label">{currentItem.size} Pizza</p>
                     {currentItem.signatureName && (
@@ -760,7 +760,7 @@ function NewOrder() {
           <div className="cart-section">
             <div className="card">
               <h2>Your Cart ({cart.length})</h2>
-              
+
               {cart.length === 0 ? (
                 <p className="empty-cart">Your cart is empty</p>
               ) : (

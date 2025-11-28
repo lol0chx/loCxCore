@@ -6,19 +6,32 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #fbeee6 0%, #e7cba9 100%);
+  position: relative;
   min-height: 100vh;
   color: #333;
 }
 
 #root {
   min-height: 100vh;
+
+/* Pizza slice emojis background */
+.pizza-bg-emoji {
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  /* font-size and opacity set inline in PizzaBackground.jsx */
+}
+
+/* Add 10 pizza slices at random positions */
+/* Removed pseudo-element pizza slices, now handled by PizzaBackground.jsx */
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  background: white;
 }
 
 button {

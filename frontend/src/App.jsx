@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import Home from './components/Home'
 import NewOrder from './components/NewOrder'
 import Ledger from './components/Ledger'
+import PizzaBackground from './components/PizzaBackground'
 import './App.css'
 
 function App() {
@@ -29,7 +30,7 @@ function App() {
         </nav>
 
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<><PizzaBackground /><Home /></>} />
           <Route path="/order" element={<NewOrder />} />
           <Route path="/ledger" element={<Ledger />} />
         </Routes>
